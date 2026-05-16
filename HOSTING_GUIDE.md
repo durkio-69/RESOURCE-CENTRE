@@ -4,7 +4,9 @@ Follow this guide to launch your application to the world and ensure your **Data
 
 ## 1. Firebase (The Database)
 To make sure the database works in production:
-1. **Enable Google Sign-In:** Go to the [Firebase Console](https://console.firebase.google.com/), select your project -> **Authentication** -> **Sign-in method** -> Enable **Google**.
+1. **Enable Authentication Providers:** Go to the [Firebase Console](https://console.firebase.google.com/), select your project -> **Authentication** -> **Sign-in method**.
+   - Enable **Google**.
+   - Enable **Email/Password**. **If you skip this, standard login/register will fail.**
 2. **Authorized Domains:** In the same Authentication tab -> **Settings** -> **Authorized domains** -> Add your new domain (e.g., `your-app.netlify.app` or `your-site.com`). **If you skip this, login will fail.**
 3. **Firestore Security Rules:** I have already deployed the rules. If you ever change the database structure, remember to deploy the `firestore.rules` file from the Settings menu.
 

@@ -31,7 +31,8 @@ import {
   MessageSquare,
   Send,
   Trash2,
-  CheckCircle2 as WhatsAppIcon
+  CheckCircle2 as WhatsAppIcon,
+  Lock
 } from "lucide-react";
 const WhatsApp = ({ className }: { className?: string }) => (
   <svg 
@@ -74,7 +75,10 @@ import {
   doc,
   setDoc,
   getDoc,
-  db
+  db,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile
 } from "./firebase";
 import { User } from "firebase/auth";
 
@@ -612,6 +616,13 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Stationery");
+  
+  // Auth Form State
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authDisplayName, setAuthDisplayName] = useState("");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -642,6 +653,52 @@ export default function App() {
       setIsAuthModalOpen(false);
     } catch (error) {
       console.error("Login failed:", error);
+    }
+  };
+
+  const handleEmailSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    setIsAuthLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, authEmail, authPassword);
+      await updateProfile(userCredential.user, { displayName: authDisplayName });
+      // Sync to Firestore manually since profile update happens after creation
+      const userDocRef = doc(db, 'users', userCredential.user.uid);
+      await setDoc(userDocRef, {
+        uid: userCredential.user.uid,
+        displayName: authDisplayName,
+        email: authEmail,
+        photoURL: null,
+        role: 'member',
+        createdAt: serverTimestamp()
+      });
+      setIsAuthModalOpen(false);
+      setAuthEmail("");
+      setAuthPassword("");
+      setAuthDisplayName("");
+    } catch (error: any) {
+      console.error("Signup failed:", error);
+      setAuthError(error.message);
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    setIsAuthLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, authEmail, authPassword);
+      setIsAuthModalOpen(false);
+      setAuthEmail("");
+      setAuthPassword("");
+    } catch (error: any) {
+      console.error("Login failed:", error);
+      setAuthError(error.message);
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
@@ -949,6 +1006,22 @@ export default function App() {
                     {link.label}
                   </a>
                 ))}
+                
+                {user ? (
+                  <button 
+                    onClick={() => { setIsMobileMenuOpen(false); setIsMyBookingsOpen(true); }}
+                    className="w-full text-left px-4 py-4 text-xs font-black uppercase tracking-[0.2em] text-indigo-600 hover:bg-indigo-50 rounded-2xl transition-all"
+                  >
+                    Dashboard & Bookings
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => { setIsMobileMenuOpen(false); setIsAuthModalOpen(true); }}
+                    className="w-full text-left px-4 py-4 text-xs font-black uppercase tracking-[0.2em] text-slate-600 hover:text-indigo-600 hover:bg-slate-50 rounded-2xl transition-all"
+                  >
+                    Log In / Register
+                  </button>
+                )}
               </div>
             </motion.div>
           )}
@@ -1775,29 +1848,81 @@ export default function App() {
                 <div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center mx-auto mb-8">
                   {authTab === "login" ? <Users className="w-10 h-10 text-indigo-600" /> : <Award className="w-10 h-10 text-indigo-600" />}
                 </div>
-                <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-4 leading-none">
+                <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-2 leading-none">
                   {authTab === "login" ? "Welcome Back." : "Create Account."}
                 </h3>
-                <p className="text-slate-500 font-medium mb-12">
+                <p className="text-slate-500 font-medium mb-8 text-sm">
                   {authTab === "login" 
                     ? "Access your dashboard and manage your hub activity effortlessly." 
                     : "Join the largest youth resource community in Kinawataka today."}
                 </p>
+
+                {authError && (
+                  <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-[10px] font-bold text-rose-600 uppercase tracking-widest leading-relaxed">
+                    {authError}
+                  </div>
+                )}
                 
+                <form onSubmit={authTab === "login" ? handleEmailLogin : handleEmailSignup} className="space-y-4 mb-8">
+                  {authTab === "signup" && (
+                    <div className="relative">
+                      <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                      <input 
+                        type="text"
+                        required
+                        placeholder="Full Name"
+                        value={authDisplayName}
+                        onChange={(e) => setAuthDisplayName(e.target.value)}
+                        className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 transition-all shadow-inner"
+                      />
+                    </div>
+                  )}
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input 
+                      type="email"
+                      required
+                      placeholder="Email Address"
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 transition-all shadow-inner"
+                    />
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input 
+                      type="password"
+                      required
+                      placeholder="Password"
+                      value={authPassword}
+                      onChange={(e) => setAuthPassword(e.target.value)}
+                      className="w-full pl-12 pr-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-600/20 focus:border-indigo-600 transition-all shadow-inner"
+                    />
+                  </div>
+                  <button 
+                    type="submit"
+                    disabled={isAuthLoading}
+                    className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 disabled:opacity-50"
+                  >
+                    {isAuthLoading ? "Processing..." : (authTab === "login" ? "Sign In" : "Create Account")}
+                  </button>
+                </form>
+                
+                <div className="relative py-4 mb-4">
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
+                  <div className="relative flex justify-center text-[10px] uppercase font-black tracking-widest"><span className="px-4 bg-white text-slate-300">Or continue with</span></div>
+                </div>
+
                 <div className="space-y-4">
                   <button 
+                    type="button"
                     onClick={handleGoogleLogin}
                     className="w-full bg-slate-50 border border-slate-200 text-slate-900 py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center space-x-3 hover:bg-white hover:border-indigo-200 transition-all shadow-sm hover:shadow-xl hover:shadow-indigo-50 group"
                   >
                     <Globe className="w-4 h-4 text-indigo-600 group-hover:scale-110 transition-transform" />
-                    <span>{authTab === "login" ? "Login with Google" : "Register with Google"}</span>
+                    <span>Google Account</span>
                   </button>
                   
-                  <div className="relative py-4">
-                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
-                    <div className="relative flex justify-center text-xs uppercase font-bold tracking-widest"><span className="px-4 bg-white text-slate-300">Community Membership</span></div>
-                  </div>
-
                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest leading-relaxed">
                     By continuing, you agree to the <br /> Youth City Hub terms of service.
                   </p>

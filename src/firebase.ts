@@ -1,6 +1,15 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, addDoc, serverTimestamp, doc, setDoc, getDoc } from 'firebase/firestore';
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from 'firebase/auth';
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signInWithPopup, 
+  GoogleAuthProvider, 
+  signOut,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile
+} from 'firebase/auth';
 import firebaseConfig from '../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
@@ -47,4 +56,17 @@ export const bookingsRef = collection(db, 'bookings');
 export const inquiriesRef = collection(db, 'inquiries');
 export const usersRef = collection(db, 'users');
 
-export { collection, addDoc, serverTimestamp, onAuthStateChanged, signInWithPopup, signOut, doc, setDoc, getDoc };
+export { 
+  collection, 
+  addDoc, 
+  serverTimestamp, 
+  onAuthStateChanged, 
+  signInWithPopup, 
+  signOut, 
+  doc, 
+  setDoc, 
+  getDoc,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile
+};
