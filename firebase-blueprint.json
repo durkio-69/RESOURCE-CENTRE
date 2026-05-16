@@ -1,0 +1,62 @@
+{
+  "entities": {
+    "booking": {
+      "title": "Booking",
+      "description": "An appointment booking for a service.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "service": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "surname": { "type": "string" },
+        "givenName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["service", "surname", "givenName", "phone", "createdAt"]
+    },
+    "user": {
+      "title": "User Profile",
+      "description": "Public profile for a hub member.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "role": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    },
+    "inquiry": {
+      "title": "Inquiry",
+      "description": "A message submitted via the contact form.",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "type": { "type": "string" },
+        "message": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["fullName", "email", "type", "message", "createdAt"]
+    }
+  },
+  "firestore": {
+    "users": {
+        "schema": "user",
+        "description": "Collection of user profiles."
+    },
+    "bookings": {
+      "schema": "booking",
+      "description": "Collection of service bookings."
+    },
+    "inquiries": {
+      "schema": "inquiry",
+      "description": "Collection of contact form inquiries."
+    }
+  }
+}

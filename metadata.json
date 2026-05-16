@@ -1,0 +1,6 @@
+{
+  "name": "Youth City Resource Centre",
+  "description": "A modern resource centre providing stationery services, government applications, and high-speed Wi-Fi for the community.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
