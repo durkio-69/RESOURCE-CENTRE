@@ -20,15 +20,33 @@ This is the easiest way to host this specific app.
 - It will automatically handle the server, SSL, and scaling.
 
 ### Option B: Netlify (REFACTORED)
-You are in luck! I have already refactored the app to work on Netlify using **Netlify Functions**.
-1. **Connect GitHub:** Push this code to a GitHub repo and connect it to Netlify.
-2. **Settings:** Netlify will automatically detect the settings:
+You are in luck! I have already refactored the app to work on Netlify using **Netlify Functions**. 
+
+#### Step 1: Connect to Netlify
+1. Push this code to a **GitHub repository**.
+2. Go to [Netlify](https://app.netlify.com/), click **Add new site** -> **Import an existing project**.
+3. Choose GitHub and select your repository.
+4. Netlify will automatically detect the settings:
    - **Build Command:** `npm run build`
    - **Publish Directory:** `dist`
    - **Functions Folder:** `netlify/functions`
-3. **Environment Variables:** Set these in Netlify (Site settings -> Environment variables):
-   - `GEMINI_API_KEY`, `PESAPAL_CONSUMER_KEY`, `PESAPAL_CONSUMER_SECRET`, `PESAPAL_ENV`, `PESAPAL_IPN_URL`, `PESAPAL_REDIRECT_URL`.
-4. **Login Fix:** Don't forget to add your Netlify URL (e.g., `https://your-app.netlify.app`) to your **Firebase Console -> Authentication -> Authorized domains**.
+
+#### Step 2: Add Environment Variables
+1. Once the site is created, click the **Site configuration** tab in the top menu.
+2. On the left sidebar, click **Environment variables**.
+3. Click the **Add a variable** button -> **Add single variable**.
+4. Add these one by one from your `.env.example` (copy the names exactly):
+   - `GEMINI_API_KEY`
+   - `PESAPAL_CONSUMER_KEY`
+   - `PESAPAL_CONSUMER_SECRET`
+   - `PESAPAL_ENV` (set to `sandbox` for testing or `live` for real money)
+   - `PESAPAL_IPN_URL` (e.g., `https://your-site.netlify.app/api/pesapal/ipn`)
+   - `PESAPAL_REDIRECT_URL` (e.g., `https://your-site.netlify.app/`)
+
+#### Step 3: Fix Firebase (Crucial for Login)
+1. Go to your [Firebase Console](https://console.firebase.google.com/) -> **Authentication** -> **Settings** -> **Authorized domains**.
+2. Click **Add domain** and enter your site name (e.g., `your-app.netlify.app`).
+3. Also go to the **Sign-in method** tab and click **Add new provider** -> **Email/Password** -> Enable it and Save.
 
 ### Option C: Railway or Heroku
 1. Connect your GitHub repository.

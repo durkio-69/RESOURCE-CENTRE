@@ -17,7 +17,7 @@ const ai = new GoogleGenAI({
 app.use(express.json());
 
 // Chat API
-app.post("/api/chat", async (req, res) => {
+app.post("/chat", async (req, res) => {
   const { message, history } = req.body;
   try {
     const response = await ai.models.generateContent({
@@ -87,7 +87,7 @@ async function registerIPN(token: string) {
   }
 }
 
-app.post("/api/pesapal/initiate", async (req, res) => {
+app.post("/pesapal/initiate", async (req, res) => {
   const { amount, phone, email, itemName, description } = req.body;
 
   try {
