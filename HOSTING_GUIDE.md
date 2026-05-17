@@ -45,8 +45,16 @@ You are in luck! I have already refactored the app to work on Netlify using **Ne
 
 #### Step 3: Fix Firebase (Crucial for Login)
 1. Go to your [Firebase Console](https://console.firebase.google.com/) -> **Authentication** -> **Settings** -> **Authorized domains**.
-2. Click **Add domain** and enter your site name (e.g., `your-app.netlify.app`).
+2. Click **Add domain** and enter your site name (e.g., `youthcity.netlify.app`).
 3. Also go to the **Sign-in method** tab and click **Add new provider** -> **Email/Password** -> Enable it and Save.
+
+#### Step 4: Configure PesaPal Dashboard
+1. Log in to your [PesaPal Dashboard](https://pay.pesapal.com/dashboard/merchant/login).
+2. Go to **Account Settings** -> **IPN Settings**.
+3. **Website Domain:** Enter `https://youthcity.netlify.app`
+4. **IPN Listener Url:** Enter `https://youthcity.netlify.app/api/pesapal/ipn`
+5. Click **SAVE URL**.
+6. This allows PesaPal to talk to your website and confirm when a payment is successful.
 
 ### Option C: Railway or Heroku
 1. Connect your GitHub repository.

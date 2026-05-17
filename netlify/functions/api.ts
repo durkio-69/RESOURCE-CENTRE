@@ -123,4 +123,17 @@ app.post("/pesapal/initiate", async (req, res) => {
   }
 });
 
+// PesaPal IPN Listener
+app.get("/pesapal/ipn", async (req, res) => {
+  const { OrderTrackingId, OrderMerchantReference, OrderNotificationType } = req.query;
+  
+  console.log("PesaPal IPN Received:", { OrderTrackingId, OrderMerchantReference, OrderNotificationType });
+
+  // PesaPal expects a 200 OK with the tracking ID back
+  res.status(200).json({
+    order_tracking_id: OrderTrackingId,
+    status: 200
+  });
+});
+
 export const handler = serverless(app);
